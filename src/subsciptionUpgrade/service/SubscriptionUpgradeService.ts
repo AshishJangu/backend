@@ -29,6 +29,7 @@ export class SubscriptionUpgradeService {
           subscriptionRequest.userId,
         );
       subscription.id = subscriptionRequest.subscriptionId;
+      // Annual subscription only
       subscription.expirationTs = new Date(
         new Date().setFullYear(new Date().getFullYear() + 1),
       );
