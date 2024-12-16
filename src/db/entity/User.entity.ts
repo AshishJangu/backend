@@ -12,9 +12,6 @@ export class UserEntity extends BaseEntity {
   @Column({ name: 'lname' })
   lName: string;
 
-  @Column({ name: 'phone_verification', default: 0 })
-  phoneVerificationStatus: number;
-
   @Column({
     name: 'creation_date',
     type: 'timestamp',
