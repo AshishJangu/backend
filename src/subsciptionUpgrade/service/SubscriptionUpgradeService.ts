@@ -33,7 +33,7 @@ export class SubscriptionUpgradeService {
       subscription.id = subscriptionRequest.subscriptionId;
       // Annual subscription only
       subscription.expirationTs = new Date(
-        new Date().setFullYear(new Date().getFullYear() + 1),
+        new Date().setFullYear(subscription.expirationTs.getFullYear() + 1),
       );
       await this.subscriptionDatabaseService.updateSubscription(subscription);
     } catch (error) {
