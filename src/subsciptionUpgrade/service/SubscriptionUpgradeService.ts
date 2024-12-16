@@ -22,6 +22,15 @@ export class SubscriptionUpgradeService {
         .processPayment(subscriptionRequest)
         .then((response) => {
           if (response.status == 'success') {
+            const subscription =
+              await this.subscriptionDatabaseService.findByUserIdOrThrow(
+                subscriptionRequest.userId,
+              );
+            subscription.id = subscriptionRequest.subscriptionId;
+            const currentDate = new Date();
+            currentDate.setFullYear(currentDate.getFullYear() + 1);
+            subscription.expirationTs = currentDate;
+            this.subscriptionDatabaseService.updateSubscription(subscription);
             //Upgrade subscription
           } else {
             throw new Error('Payment failure exception');

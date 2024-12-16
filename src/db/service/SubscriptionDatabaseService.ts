@@ -6,7 +6,7 @@ import { SubscriptionEntity } from '../entity/Subscription.entity';
 export class SubscriptionDatabaseService {
   constructor(private subscriptionRepository: SubscriptionRepository) {}
 
-  async findByIdOrThrow(user_id: number): Promise<SubscriptionEntity> {
+  async findByUserIdOrThrow(user_id: number): Promise<SubscriptionEntity> {
     const subscriptionEntity =
       await this.subscriptionRepository.findByUserId(user_id);
     if (!subscriptionEntity) {
