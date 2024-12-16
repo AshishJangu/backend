@@ -11,33 +11,30 @@ export class SubscriptionUpgradeService {
   ) {}
 
   async upgrade(subscriptionRequest: SubscriptionRequest): Promise<void> {
-    const isValid = await this.paymentGatewayService.validateCard(
-      subscriptionRequest.cardDetails,
-    );
-    if (isValid) {
-      const paymentGatewayService = new PaymentGatewayService(
-        'https://api.paymentgateway.com',
-      );
-      paymentGatewayService
-        .processPayment(subscriptionRequest)
-        .then((response) => {
-          if (response.status == 'success') {
-            const subscription =
-              await this.subscriptionDatabaseService.findByUserIdOrThrow(
-                subscriptionRequest.userId,
-              );
-            subscription.id = subscriptionRequest.subscriptionId;
-            const currentDate = new Date();
-            currentDate.setFullYear(currentDate.getFullYear() + 1);
-            subscription.expirationTs = currentDate;
-            this.subscriptionDatabaseService.updateSubscription(subscription);
-            //Upgrade subscription
-          } else {
-            throw new Error('Payment failure exception');
-          }
-        });
-    } else {
+    if (
+      !(await this.paymentGatewayService.validateCard(
+        subscriptionRequest.cardDetails,
+      ))
+    ) {
       throw new Error('Invalid card details');
+    }
+    try {
+      const response =
+        await this.paymentGatewayService.processPayment(subscriptionRequest);
+      if (response.status !== 'success') {
+        throw new Error('Payment failure exception');
+      }
+      const subscription =
+        await this.subscriptionDatabaseService.findByUserIdOrThrow(
+          subscriptionRequest.userId,
+        );
+      subscription.id = subscriptionRequest.subscriptionId;
+      subscription.expirationTs = new Date(
+        new Date().setFullYear(new Date().getFullYear() + 1),
+      );
+      await this.subscriptionDatabaseService.updateSubscription(subscription);
+    } catch (error) {
+      throw error;
     }
   }
 }
